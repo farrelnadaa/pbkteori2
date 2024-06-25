@@ -1,19 +1,20 @@
 <template>
   <div class="app-container">
-    <nav>
-      <button @click="currentView = 'Home'">Home</button>
-      <button @click="currentView = 'Posts'">Posts</button>
-      <button @click="currentView = 'Todos'">Todos</button>
+    <nav class="navbar">
+      <div class="menu-container">
+        <button class="menu-button" @click="toggleMenu">
+          <span class="menu-icon">&#x22EE;</span>
+        </button>
+        <div v-if="isMenuOpen" class="dropdown-menu">
+          <button @click="switchView('Posts')" class="dropdown-item">Posts</button>
+          <button @click="switchView('Todos')" class="dropdown-item">Todos</button>
+          <button @click="switchView('Photos')" class="dropdown-item">Photos</button>
+          <button @click="switchView('Album')" class="dropdown-item">Album</button>
+        </div>
+      </div>
     </nav>
-    <div class="content">
-      <component :is="currentViewComponent">
-        <template v-if="currentView === 'Posts'" #default>
-          <p>This is a slot content for Posts.</p>
-        </template>
-        <template v-if="currentView === 'Todos'" #default>
-          <p>This is a slot content for Todos.</p>
-        </template>
-      </component>
+    <div class="main-content">
+      <component :is="currentViewComponent"></component>
     </div>
   </div>
 </template>
@@ -22,8 +23,9 @@
 import { ref, computed } from 'vue'
 import Posts from './components/Posts.vue'
 import Todos from './components/Todos.vue'
+import Photos from './components/Photos.vue'
+import Album from './components/Album.vue'
 
-// Definisikan komponen Home
 const Home = {
   template: `
     <div>
@@ -34,6 +36,7 @@ const Home = {
 }
 
 const currentView = ref('Home')
+const isMenuOpen = ref(false)
 
 const currentViewComponent = computed(() => {
   switch (currentView.value) {
@@ -41,46 +44,87 @@ const currentViewComponent = computed(() => {
       return Posts
     case 'Todos':
       return Todos
+    case 'Photos':
+      return Photos
+    case 'Album':
+      return Album
     default:
       return Home
   }
 })
+
+function switchView(view) {
+  currentView.value = view
+  isMenuOpen.value = false
+}
+
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value
+}
 </script>
 
 <style scoped>
 .app-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #292727;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background-color: #211f1f;
-}
-
-nav {
-  margin-bottom: 20px;
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: column;
+  height: 100vh;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
+.navbar {
+  width: 100%;
+  background-color: #000;
+  color: white;
+  display: flex;
+  padding: 10px;
+  position: relative;
+  align-items: center;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #313030;
+}
+
+.menu-container {
+  position: relative;
+}
+
+.menu-button {
+  background: none;
   border: none;
+  color: rgb(237, 233, 233);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.menu-icon {
+  font-size: 30px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  background-color: #000;
+  border: 1px solid #333;
   border-radius: 5px;
-  background-color: #42b883;
-  color: rgb(76, 70, 70);
-  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  width: 150px; /* Adjust width for the dropdown menu */
 }
 
-button:hover {
-  background-color: #38a169;
+.dropdown-item {
+  background-color: #000;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
 }
 
-.content {
-  text-align: center;
+.dropdown-item:hover {
+  background-color: #333;
 }
 </style>
